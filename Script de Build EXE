@@ -1,0 +1,46 @@
+import PyInstaller.__main__
+import os
+import shutil
+import sys
+
+# Nom de ton application
+APP_NAME = "BotHost"
+
+def build():
+    # 1. Nettoyage des dossiers temporaires précédents
+    for folder in ['dist', 'build']:
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
+
+    print(f"🔨 Compilation de {APP_NAME} en cours...")
+
+    # 2. Configuration de PyInstaller
+    params = [
+        'main.py',                      # Fichier d'entrée principal
+        f'--name={APP_NAME}',           # Nom de l'exécutable
+        '--onefile',                    # Tout mettre dans un seul .exe
+        '--windowed',                   # Ne pas ouvrir de terminal noir en arrière-plan
+        
+        # Ajout des dossiers de ressources (Source;Destination)
+        '--add-data=web;web',           
+        '--add-data=core;core',
+        '--add-data=api;api',
+        
+        # Nettoyage automatique des fichiers temporaires après build
+        '--clean',
+    ]
+
+    # Ajout d'une icône si elle existe
+    icon_path = os.path.join('web', 'favicon.ico')
+    if os.path.exists(icon_path):
+        params.append(f'--icon={icon_path}')
+
+    # 3. Lancement du build
+    try:
+        PyInstaller.__main__.run(params)
+        print(f"\n✅ Terminé ! L'exécutable se trouve ici : dist/{APP_NAME}.exe")
+    except Exception as e:
+        print(f"\n❌ Erreur lors de la compilation : {e}")
+
+if __name__ == "__main__":
+    build()
